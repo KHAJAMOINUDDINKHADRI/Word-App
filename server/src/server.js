@@ -47,6 +47,18 @@ app.use(cors({
 }));
 app.use(express.json({ limit: '10mb' }));
 
+// Serve static files from the client's build directory
+app.use(express.static(path.join(__dirname, '../client/build')));
+
+// Routes
+app.use('/api/auth', require('./routes/auth'));
+app.use('/api/documents', verifyToken, require('./routes/documents'));
+
+// Handle all other routes by serving index.html
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+});
+
 // Initialize Google Drive API
 const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
