@@ -24,9 +24,23 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// Middleware
+// CORS configuration
+const allowedOrigins = [
+    'http://localhost:3000',
+    'https://word-app-59e3f.web.app',    // Firebase hosting URL
+    'https://word-app-59e3f.firebaseapp.com'  // Alternative Firebase URL
+];
+
 app.use(cors({
-    origin: process.env.CLIENT_URL || 'http://localhost:3000',
+    origin: function (origin, callback) {
+        // Allow requests with no origin (like mobile apps or curl requests)
+        if (!origin) return callback(null, true);
+
+        if (allowedOrigins.indexOf(origin) === -1) {
+            return callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'), false);
+        }
+        return callback(null, true);
+    },
     credentials: true,
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
