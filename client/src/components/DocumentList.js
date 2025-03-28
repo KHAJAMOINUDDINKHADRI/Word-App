@@ -26,7 +26,7 @@ function DocumentList() {
                 return;
             }
 
-            const accessToken = user?.idToken || localStorage.getItem('googleAccessToken');
+            const accessToken = user?.accessToken || localStorage.getItem('googleAccessToken');
 
             if (!accessToken) {
                 throw new Error('No access token available. Please sign in again.');

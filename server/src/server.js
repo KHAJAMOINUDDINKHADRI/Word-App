@@ -16,10 +16,17 @@ app.use(helmet({
     contentSecurityPolicy: {
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "https://apis.google.com", "'unsafe-inline'"], // Add Google and inline scripts
-            frameSrc: ["'self'", "https://accounts.google.com"], // For OAuth iframes
-            connectSrc: ["'self'", "https://www.googleapis.com"], // For API requests
-            // Add other directives as needed
+            scriptSrc: ["'self'", "https://apis.google.com", "'unsafe-inline'"],
+            frameSrc: [
+                "'self'",
+                "https://accounts.google.com",              // Google Sign-In
+                "https://word-app-59e3f.firebaseapp.com"    // Firebase Auth iframe
+            ],
+            connectSrc: [
+                "'self'",
+                "https://www.googleapis.com",               // Google Drive API
+                "https://identitytoolkit.googleapis.com"    // Firebase Auth API
+            ],
         },
     },
 }));
