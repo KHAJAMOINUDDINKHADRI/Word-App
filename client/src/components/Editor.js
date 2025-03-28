@@ -35,7 +35,7 @@ function TextEditor() {
                 throw new Error('No access token available. Please sign in again.');
             }
 
-            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/documents/${documentId}`, {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/documents/${documentId}`, {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
                 }
@@ -83,12 +83,12 @@ function TextEditor() {
             setSaving(true);
             const content = JSON.stringify(convertToRaw(editorState.getCurrentContent()));
 
-            let endpoint = `${process.env.REACT_APP_API_URL}/api/documents/save`;
+            let endpoint = `${process.env.REACT_APP_API_URL}/documents/save`;
             let method = 'post';
 
             // If we're editing an existing document, use update endpoint
             if (documentId) {
-                endpoint = `${process.env.REACT_APP_API_URL}/api/documents/${documentId}`;
+                endpoint = `${process.env.REACT_APP_API_URL}/documents/${documentId}`;
                 method = 'put';
             }
 
