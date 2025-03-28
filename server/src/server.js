@@ -13,6 +13,18 @@ const app = express();
 
 // Middleware
 app.use(helmet());
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "https://apis.google.com", "'unsafe-inline'"], // Add Google and inline scripts
+            frameSrc: ["'self'", "https://accounts.google.com"], // For OAuth iframes
+            connectSrc: ["'self'", "https://www.googleapis.com"], // For API requests
+            // Add other directives as needed
+        },
+    },
+}));
+
 app.use(compression());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 
