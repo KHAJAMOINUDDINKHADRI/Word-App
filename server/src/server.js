@@ -34,7 +34,9 @@ app.use(cors({
 }));
 
 app.use(express.json({ limit: '10mb' }));
-app.use(express.static(path.join(__dirname, '../client/build')));
+const buildPath = path.join(__dirname, '../../client/build'); // Go up two levels
+console.log('Serving static files from:', buildPath); // Debug log
+app.use(express.static(buildPath));
 
 // Google Drive API
 const oauth2Client = new google.auth.OAuth2(
@@ -70,7 +72,7 @@ app.get('/health', (req, res) => {
 
 // Catch-all for SPA
 app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+    res.sendFile(path.join(buildPath, 'index.html'));
 });
 
 // Error handling
