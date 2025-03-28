@@ -12,24 +12,24 @@ dotenv.config();
 const app = express();
 
 // Middleware
-// app.use(helmet({
-//     contentSecurityPolicy: {
-//         directives: {
-//             defaultSrc: ["'self'"],
-//             scriptSrc: ["'self'", "https://apis.google.com", "'unsafe-inline'"],
-//             frameSrc: [
-//                 "'self'",
-//                 "https://accounts.google.com",              // Google Sign-In
-//                 "https://word-app-59e3f.firebaseapp.com"    // Firebase Auth iframe
-//             ],
-//             connectSrc: [
-//                 "'self'",
-//                 "https://www.googleapis.com",               // Google Drive API
-//                 "https://identitytoolkit.googleapis.com"    // Firebase Auth API
-//             ],
-//         },
-//     },
-// }));
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "https://apis.google.com", "'unsafe-inline'"],
+            frameSrc: [
+                "'self'",
+                "https://accounts.google.com",              // Google Sign-In
+                "https://word-app-59e3f.firebaseapp.com"    // Firebase Auth iframe
+            ],
+            connectSrc: [
+                "'self'",
+                "https://www.googleapis.com",               // Google Drive API
+                "https://identitytoolkit.googleapis.com"    // Firebase Auth API
+            ],
+        },
+    },
+}));
 
 app.use(compression());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
