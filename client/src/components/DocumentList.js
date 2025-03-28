@@ -26,7 +26,7 @@ function DocumentList() {
                 return;
             }
 
-            const accessToken = user?.accessToken || localStorage.getItem('googleAccessToken');
+            const accessToken = user?.idToken || localStorage.getItem('googleAccessToken');
 
             if (!accessToken) {
                 throw new Error('No access token available. Please sign in again.');
@@ -38,7 +38,7 @@ function DocumentList() {
                 }
             });
 
-            setDocuments(response.data || []);
+            setDocuments(Array.isArray(response.data) ? response.data : []);
         } catch (error) {
             console.error('Error fetching documents:', error);
             setError(error.message || 'Failed to fetch documents');

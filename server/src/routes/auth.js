@@ -34,46 +34,15 @@ router.get('/profile', verifyToken, async (req, res) => {
     }
 });
 
-// Get Google OAuth URL
-router.get('/google/url', (req, res) => {
-    const scopes = [
-        'https://www.googleapis.com/auth/drive.file',
-        'https://www.googleapis.com/auth/drive.readonly'
-    ];
-
-    const url = oauth2Client.generateAuthUrl({
-        access_type: 'offline',
-        scope: scopes,
-        prompt: 'consent'
-    });
-
-    res.json({ url });
-});
-
-// Google OAuth callback
-router.get('/google/callback', async (req, res) => {
-    try {
-        const { code } = req.query;
-        const { tokens } = await oauth2Client.getToken(code);
-        oauth2Client.setCredentials(tokens);
-
-        // Redirect to frontend with tokens
-        res.redirect(`${process.env.CLIENT_URL}/auth/success?access_token=${tokens.access_token}`);
-    } catch (error) {
-        console.error('Error in Google callback:', error);
-        res.redirect(`${process.env.CLIENT_URL}/auth/error`);
-    }
-});
-
-// Logout
-router.post('/logout', (req, res) => {
-    req.session.destroy((err) => {
-        if (err) {
-            console.error('Error destroying session:', err);
-            return res.status(500).json({ error: 'Error logging out' });
-        }
-        res.json({ message: 'Logged out successfully' });
-    });
-});
+// // Logout
+// router.post('/logout', (req, res) => {
+//     req.session.destroy((err) => {
+//         if (err) {
+//             console.error('Error destroying session:', err);
+//             return res.status(500).json({ error: 'Error logging out' });
+//         }
+//         res.json({ message: 'Logged out successfully' });
+//     });
+// });
 
 module.exports = router; 

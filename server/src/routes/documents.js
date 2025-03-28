@@ -10,8 +10,8 @@ const verifyToken = async (req, res, next) => {
         if (!token) {
             return res.status(401).json({ error: 'No token provided' });
         }
-        const decodedToken = await admin.auth().verifyIdToken(token);
-        req.user = decodedToken;
+        // const decodedToken = await admin.auth().verifyIdToken(token);
+        req.token = token;
         next();
     } catch (error) {
         console.error('Error verifying token:', error);

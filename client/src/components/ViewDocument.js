@@ -29,7 +29,7 @@ function ViewDocument() {
             setLoading(true);
             setError(null);
 
-            const accessToken = user?.accessToken || localStorage.getItem('googleAccessToken');
+            const accessToken = user?.idToken || localStorage.getItem('googleAccessToken');
 
             if (!accessToken) {
                 throw new Error('No access token available. Please sign in again.');

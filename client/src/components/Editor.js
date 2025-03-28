@@ -29,7 +29,7 @@ function TextEditor() {
 
     const loadDocument = async () => {
         try {
-            const accessToken = user?.accessToken || localStorage.getItem('googleAccessToken');
+            const accessToken = user?.idToken || localStorage.getItem('googleAccessToken');
 
             if (!accessToken) {
                 throw new Error('No access token available. Please sign in again.');

@@ -12,7 +12,6 @@ dotenv.config();
 const app = express();
 
 // Middleware
-app.use(helmet());
 app.use(helmet({
     contentSecurityPolicy: {
         directives: {
@@ -29,7 +28,7 @@ app.use(compression());
 app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 
 const allowedOrigins = process.env.NODE_ENV === 'production'
-    ? ['https://your-production-url.com']
+    ? ['https://word-app-6xnj.onrender.com']
     : ['http://localhost:3000', 'https://word-app-59e3f.web.app', 'https://word-app-59e3f.firebaseapp.com'];
 
 app.use(cors({
@@ -46,6 +45,7 @@ app.use(cors({
 }));
 
 app.use(express.json({ limit: '10mb' }));
+
 const buildPath = path.join(__dirname, '../../client/build'); // Go up two levels
 console.log('Serving static files from:', buildPath); // Debug log
 app.use(express.static(buildPath));
@@ -54,7 +54,7 @@ app.use(express.static(buildPath));
 const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    process.env.REDIRECT_URI || 'https://your-app.onrender.com/auth/google/callback'
+    process.env.REDIRECT_URI || 'https://word-app-6xnj.onrender.com/auth/google/callback'
 );
 app.locals.oauth2Client = oauth2Client;
 
