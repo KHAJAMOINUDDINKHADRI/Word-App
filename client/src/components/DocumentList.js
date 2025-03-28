@@ -32,7 +32,7 @@ function DocumentList() {
                 throw new Error('No access token available. Please sign in again.');
             }
 
-            const response = await axios.get('http://localhost:5001/api/documents/list', {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/api/documents/list`, {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
                 }
@@ -67,7 +67,7 @@ function DocumentList() {
                 throw new Error('No access token available. Please sign in again.');
             }
 
-            await axios.delete(`http://localhost:5001/api/documents/${documentId}`, {
+            await axios.delete(`${process.env.REACT_APP_API_URL}/api/documents/${documentId}`, {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
                 }
