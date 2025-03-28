@@ -5,39 +5,26 @@ const { google } = require('googleapis');
 const helmet = require('helmet');
 const compression = require('compression');
 const rateLimit = require('express-rate-limit');
+const path = require('path');
 
-// Load environment variables
 dotenv.config();
 
 const app = express();
 
-// Security headers
+// Middleware
 app.use(helmet());
-
-// Compression
 app.use(compression());
+app.use(rateLimit({ windowMs: 15 * 60 * 1000, max: 100 }));
 
-// Rate limiting
-const limiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 100 // limit each IP to 100 requests per windowMs
-});
-app.use(limiter);
-
-// CORS configuration
-const allowedOrigins = [
-    'http://localhost:3000',
-    'https://word-app-59e3f.web.app',    // Firebase hosting URL
-    'https://word-app-59e3f.firebaseapp.com'  // Alternative Firebase URL
-];
+const allowedOrigins = process.env.NODE_ENV === 'production'
+    ? ['https://your-production-url.com']
+    : ['http://localhost:3000', 'https://word-app-59e3f.web.app', 'https://word-app-59e3f.firebaseapp.com'];
 
 app.use(cors({
     origin: function (origin, callback) {
-        // Allow requests with no origin (like mobile apps or curl requests)
         if (!origin) return callback(null, true);
-
         if (allowedOrigins.indexOf(origin) === -1) {
-            return callback(new Error('The CORS policy for this site does not allow access from the specified Origin.'), false);
+            return callback(new Error('CORS policy violation'), false);
         }
         return callback(null, true);
     },
@@ -45,39 +32,26 @@ app.use(cors({
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     allowedHeaders: ['Content-Type', 'Authorization']
 }));
-app.use(express.json({ limit: '10mb' }));
 
-// Serve static files from the client's build directory
+app.use(express.json({ limit: '10mb' }));
 app.use(express.static(path.join(__dirname, '../client/build')));
 
-// Routes
-app.use('/api/auth', require('./routes/auth'));
-app.use('/api/documents', verifyToken, require('./routes/documents'));
-
-// Handle all other routes by serving index.html
-app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
-});
-
-// Initialize Google Drive API
+// Google Drive API
 const oauth2Client = new google.auth.OAuth2(
     process.env.GOOGLE_CLIENT_ID,
     process.env.GOOGLE_CLIENT_SECRET,
-    process.env.REDIRECT_URI || 'http://localhost:5001/auth/google/callback'
+    process.env.REDIRECT_URI || 'https://your-app.onrender.com/auth/google/callback'
 );
-
-// Make oauth2Client available to routes
 app.locals.oauth2Client = oauth2Client;
 
-// Middleware to verify Firebase token
+// Token verification middleware
 const verifyToken = async (req, res, next) => {
     try {
         const token = req.headers.authorization?.split('Bearer ')[1];
         if (!token) {
             return res.status(401).json({ error: 'No access token provided' });
         }
-        // The token verification will be handled by Firebase on the client side
-        req.token = token;
+        req.token = token; // Add server-side verification if needed
         next();
     } catch (error) {
         console.error('Error verifying token:', error);
@@ -85,19 +59,23 @@ const verifyToken = async (req, res, next) => {
     }
 };
 
-// Health check endpoint
-app.get('/health', (req, res) => {
-    res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
-});
-
 // Routes
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/documents', verifyToken, require('./routes/documents'));
 
-// Error handling middleware
+// Health check
+app.get('/health', (req, res) => {
+    res.status(200).json({ status: 'OK', timestamp: new Date().toISOString() });
+});
+
+// Catch-all for SPA
+app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+});
+
+// Error handling
 app.use((err, req, res, next) => {
     console.error('Error details:', err);
-    // Don't expose error details in production
     const isProduction = process.env.NODE_ENV === 'production';
     res.status(500).json({
         error: 'Something went wrong!',
@@ -105,7 +83,6 @@ app.use((err, req, res, next) => {
     });
 });
 
-// 404 handler
 app.use((req, res) => {
     res.status(404).json({ error: 'Not found' });
 });
@@ -113,4 +90,5 @@ app.use((req, res) => {
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
     console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
-}); 
+    console.log('Serving static files from:', path.join(__dirname, '../client/build'));
+});
