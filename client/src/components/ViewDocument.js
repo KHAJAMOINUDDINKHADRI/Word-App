@@ -35,7 +35,7 @@ function ViewDocument() {
                 throw new Error('No access token available. Please sign in again.');
             }
 
-            const response = await axios.get(`http://localhost:5001/api/documents/${documentId}`, {
+            const response = await axios.get(`${process.env.REACT_APP_API_URL}/documents/${documentId}`, {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`
                 }
@@ -50,7 +50,14 @@ function ViewDocument() {
             }
         } catch (error) {
             console.error('Error loading document:', error);
-            setError(error.response?.data?.details || error.message || 'Error loading document');
+            if (error.response?.status === 404) {
+                setError('Document not found. It may have been deleted or you may not have permission to access it.');
+            } else if (error.response?.status === 401) {
+                setError('Your session has expired. Please sign in again.');
+                navigate('/login');
+            } else {
+                setError(error.response?.data?.details || error.message || 'Error loading document');
+            }
         } finally {
             setLoading(false);
         }
